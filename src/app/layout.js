@@ -2,6 +2,10 @@ import localFont from "next/font/local";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { AuthProvider } from "./context/AuthContext";
+import 'typeface-merriweather';
+import 'typeface-source-code-pro';
+import 'typeface-roboto';
+
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",

@@ -11,7 +11,13 @@ const Login = () => {
     const [credentials, setCredentials] = useState({ email: "", password: "" });
     const [loading, setLoading] = useState(false);
     const [alert, setAlert] = useState({ type: '', message: '' });
-    const { login } = useAuth();
+    const { login,isLoggedIn } = useAuth();
+
+    useEffect(() => {
+        if (isLoggedIn) {
+            router.push('/'); 
+        }
+    }, [isLoggedIn]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -75,13 +81,13 @@ const Login = () => {
     return (
         <div className="min-h-screen flex items-center justify-center bg-white">
             <div className="bg-white shadow-xl w-full max-w-lg px-6 py-10 sm:px-8 sm:py-12 lg:px-10 lg:py-14 rounded-lg">
-                <h2 className="text-2xl sm:text-3xl font-bold text-center text-zinc-700 mb-6 uppercase tracking-wider">
+                <h2 className="text-2xl sm:text-3xl font-bold text-center text-zinc-700 mb-6 uppercase tracking-wider font-header">
                     Welcome Back
                 </h2>
 
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
-                        <label htmlFor="email" className="block text-zinc-700 mb-2 font-bold tracking-wide">Email</label>
+                        <label htmlFor="email" className="block text-zinc-700 mb-2 font-bold tracking-wide font-header">Email</label>
                         <input
                             name="email"
                             type="text"
@@ -95,7 +101,7 @@ const Login = () => {
                     </div>
 
                     <div className="mb-6">
-                        <label htmlFor="password" className="block text-zinc-700 mb-2 font-bold tracking-wide">Password</label>
+                        <label htmlFor="password" className="block text-zinc-700 mb-2 font-bold tracking-wide font-header">Password</label>
                         <input
                             name="password"
                             type="password"
@@ -111,7 +117,7 @@ const Login = () => {
                     <div className="flex justify-center">
                         <button
                             type="submit"
-                            className={`w-full sm:w-1/2 bg-slate-950 hover:bg-teal-800 text-white py-3 sm:py-4 uppercase text-md font-semibold tracking-wider transition duration-200 flex justify-center items-center ${loading ? "cursor-not-allowed" : ""}`}
+                            className={`w-full font-header text-sm sm:w-1/2 bg-slate-950 hover:bg-teal-800 text-white py-3 sm:py-4 uppercase text-md font-semibold tracking-wider transition duration-200 flex justify-center items-center ${loading ? "cursor-not-allowed" : ""}`}
                             disabled={loading}
                         >
                             {loading ? <LoaderCircle className="animate-spin text-zinc-200" /> : "Login"}
@@ -127,7 +133,7 @@ const Login = () => {
 
                 <p className="text-center text-gray-600 mt-6">
                     Don&#39;t have an account?{' '}
-                    <Link href="/sign-up" className="text-blue-500 hover:underline cursor-pointer">
+                    <Link href="/sign-up" className="text-blue-500 hover:underline cursor-pointer font-header text-sm">
                         Sign up
                     </Link>
                 </p>

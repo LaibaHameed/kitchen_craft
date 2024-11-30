@@ -15,14 +15,14 @@ const Navbar = () => {
     return (
         <header className="bg-white dark:bg-gray-900 shadow-md">
             <div className="mx-auto max-w-screen-xl px-4 py-2 sm:px-6 lg:px-8">
-                <div className="flex h-16 items-center justify-between">
+                <div className="flex sm:h-16 h-12 items-center justify-between">
                     {/* Logo Section */}
                     <div className="flex-1 flex items-center">
                         <Link
-                            className="block text-teal-600 dark:text-teal-300 text-2xl font-semibold"
+                            className="block text-teal-600 dark:text-teal-300 sm:text-2xl text-xl font-semibold font-header"
                             href="/"
                         >
-                            Logo
+                            KitchenCrafts
                         </Link>
                     </div>
 
@@ -34,12 +34,12 @@ const Navbar = () => {
                                 <div className="group relative">
                                     <Link
                                         href={'/favorites'}
-                                        className="bg-teal-600 p-2 rounded-full hover:bg-teal-500 cursor-pointer flex items-center justify-center"
+                                        className="bg-teal-600 p-1  hover:bg-teal-500 cursor-pointer flex items-center justify-center"
                                     >
-                                        <Heart className="text-white" />
+                                        <Heart className="text-white" height={20} />
                                     </Link>
-                                    <span className="absolute left-1/2 transform -translate-x-1/2 top-0 mt-12 text-xs bg-gray-100 opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-gray-800 px-2 py-1 rounded-lg">
-                                        Favorites
+                                    <span className="absolute left-1/2 transform -translate-x-1/2 top-0 mt-10 text-xs bg-gray-100 opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-gray-800 px-2 py-1 rounded-lg">
+                                        Favorites Recipes
                                     </span>
                                 </div>
 
@@ -47,9 +47,9 @@ const Navbar = () => {
                                 <div className="relative">
                                     <div
                                         onClick={toggleProfilePopup}
-                                        className="bg-teal-600 p-2 rounded-full hover:bg-teal-500 cursor-pointer flex items-center justify-center"
+                                        className="bg-teal-600 p-1  hover:bg-teal-500 cursor-pointer flex items-center justify-center"
                                     >
-                                        <User className="text-white" />
+                                        <User className="text-white" height={20} />
                                     </div>
 
                                     {showProfilePopup && (
@@ -68,13 +68,13 @@ const Navbar = () => {
 
                                             {/* Profile Popup Content */}
                                             <div className="flex flex-col items-center mb-4">
-                                                <h3 className="text-lg font-bold m-2">Welcome</h3>
+                                                <h3 className="text-lg font-bold m-2 font-header">Welcome</h3>
                                                 <p className="text-sm mb-4">
                                                     You are signed in as <br />
                                                     <span className="font-medium text-muted">{user?.email}</span>
                                                 </p>
                                                 <button
-                                                    className="rounded-md bg-red-500 px-4 py-2 text-xs font-medium cursor-pointer text-white shadow hover:bg-red-600"
+                                                    className="rounded-md bg-red-500 px-4 py-2 text-xs font-header cursor-pointer text-white shadow hover:bg-red-600 font-semibold"
                                                     onClick={logout}
                                                 >
                                                     Sign Out
@@ -88,18 +88,18 @@ const Navbar = () => {
                         ) : (
                             <div className="flex items-center gap-4">
                                 <Link
-                                    className="rounded-md bg-teal-600 px-5 py-2.5 text-sm font-medium text-white shadow hover:bg-teal-500 transition-colors"
+                                    className="rounded-md bg-teal-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-teal-500 transition-colors"
                                     href="/login"
                                 >
                                     Login
                                 </Link>
 
-                                <Link
+                                {/* <Link
                                     className="rounded-md bg-gray-100 px-5 py-2.5 text-sm font-medium text-teal-600 hover:bg-gray-300 hover:text-teal-800 transition-colors"
                                     href="/sign-up"
                                 >
                                     Register
-                                </Link>
+                                </Link> */}
                             </div>
                         )}
                     </div>

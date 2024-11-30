@@ -1,15 +1,17 @@
 'use client';
 import { useAuth } from '@/app/context/AuthContext';
 import axios from 'axios';
-import { Trash } from 'lucide-react';
+import { PlusSquare, Trash } from 'lucide-react';
 import Link from 'next/link';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const SideBar = () => {
-  const { isLoggedIn, user, token } = useAuth(); // Ensure token is included in context
+  const { isLoggedIn, user, token } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [ingredients, setIngredients] = useState([]);
+  const [recipes, setRecipes] = useState([]);
+  const suggestRef = useRef(null);
 
   // Fetch user's pantry from the database on login
   useEffect(() => {
@@ -17,6 +19,18 @@ const SideBar = () => {
       fetchPantry();
     }
   }, [isLoggedIn, user]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (suggestRef.current && !suggestRef.current.contains(event.target)) {
+        setSuggestions([]);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
 
   const fetchPantry = async () => {
     const token = localStorage.getItem('token');  // Fallback to direct localStorage
@@ -30,9 +44,10 @@ const SideBar = () => {
           Authorization: `Bearer ${token}`, // Send token directly
         },
       });
+      console.log(response.data.pantry);
       setIngredients(response.data.pantry || []);
     } catch (error) {
-      console.error('Error fetching pantry:', error.message);
+      console.error('Error fetching pantry in sidebar:', error.message);
     }
   };
 
@@ -62,7 +77,7 @@ const SideBar = () => {
     }
 
     try {
-      const response = await axios.get('/api/autocomplete', { params: { query } });
+      const response = await axios.get('/api/autocomplete-ingredients', { params: { query } });
       setSuggestions(
         response.data.map((item, index) => ({
           ...item,
@@ -109,49 +124,59 @@ const SideBar = () => {
 
   return (
     <div>
-      <div className="mt-6 mx-4 p-2 w-full">
-        <h2 className="text-lg m-2">Add Ingredients</h2>
+      <div className="mt-4 mx-4 p-2 flex flex-col items-center">
+
+        <h2 className="text-md m-2 font-semibold font-header text-teal-700">Add Ingredients</h2>
         {!isLoggedIn && (
           <p className="text-sm text-yellow-800 my-2">
-            <Link href={'/login'} className='text-blue-700 underline'> Log in </Link> to save your pantry and sync it across devices.
+            <Link href={'/login'} className='text-blue-700 underline font-header'> Log in</Link>  to save your pantry and sync it across devices.
           </p>
         )}
-        <div className="flex justify-center relative">
+
+        {/* input part */}
+        <div className="flex justify-center relative w-full">
           <input
             type="text"
             placeholder="Enter ingredients (e.g., chicken, tomato)..."
             value={searchQuery}
             onChange={handleInputChange}
-            className="w-full p-3 text-sm border border-teal-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+            className="w-80 p-3 text-xs border border-teal-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
           />
+
 
           {/* Autocomplete Suggestions */}
           {suggestions.length > 0 && (
-            <ul className="absolute text-sm top-14 w-full bg-white border border-teal-600 rounded-lg shadow-md z-10">
-              {suggestions.map((suggestion) => (
+            <ul className="absolute text-sm top-14 w-full bg-white border border-teal-600 rounded-lg shadow-md z-10" ref={suggestRef}>
+              {suggestions.map((suggestion, i) => (
                 <li
-                  key={suggestion.id} // Ensure unique key
+                  key={suggestion.id || i} // Ensure unique key
                   onClick={() => handleSuggestionClick(suggestion)}
-                  className="p-3 cursor-pointer hover:bg-teal-100"
+                  className="p-3 cursor-pointer hover:bg-teal-100 relative pr-12"
                 >
                   {suggestion.name}
+                  <button
+                    onClick={() => handleSuggestionClick(suggestion)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-teal-600 hover:text-teal-800"
+                  >
+                    <PlusSquare />
+                  </button>
                 </li>
               ))}
             </ul>
           )}
         </div>
 
-        <p className='text-sm capitalize my-4'> you have {ingredients.length} pentry items.</p>
+        <p className='text-sm capitalize mt-4 font-body'> you have <span className='text-teal-700 font-numbers'>{ingredients.length}</span> pentry items.</p>
         {/* Ingredients List */}
-        <ul className="mt-4">
+        <ul className="m-4 flex flex-wrap">
           {ingredients.map((ingredient) => (
             <li
               key={ingredient.id} // Ensure unique key
-              className="flex justify-between items-center border m-2 py-2 px-4 border-teal-800 rounded-xl hover:bg-teal-100"
+              className="w-auto flex justify-between items-center border  mr-2 mb-2 py-1 px-2 border-teal-800 hover:bg-teal-50"
             >
-              <span>{ingredient.name}</span>
+              <span className='text-sm mr-2'>{ingredient.name}</span>
               <Trash
-                width={20}
+                width={15}
                 className="text-red-800 cursor-pointer"
                 onClick={() => handleRemoveIngredient(ingredient.id)}
               />

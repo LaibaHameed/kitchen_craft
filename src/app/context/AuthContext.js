@@ -1,7 +1,8 @@
-'use client'
+'use client';
 
 import { useRouter } from 'next/navigation';
 import { createContext, useContext, useEffect, useState } from 'react';
+import jwt from 'jsonwebtoken';
 
 const AuthContext = createContext();
 
@@ -11,45 +12,46 @@ export const AuthProvider = ({ children }) => {
     const [token, setToken] = useState(null);
     const router = useRouter();
 
+    const isTokenValid = (token) => {
+        try {
+            const decoded = jwt.decode(token);
+            return decoded;
+        } catch (error) {
+            console.error('Invalid token:', error);
+            return false;
+        }
+    };
+
     useEffect(() => {
-        if (typeof window !== 'undefined') {
-            setToken(localStorage.getItem('token'));
-            console.log(token);
-            const userEmail = localStorage.getItem('userEmail');
-            if (token && userEmail) {
-                setIsLoggedIn(true);
-                setUser({ email: userEmail }); // Assuming only email for now
-            }
+        const storedToken = localStorage.getItem('token');
+        const userEmail = localStorage.getItem('userEmail');
+
+        if (storedToken && userEmail && isTokenValid(storedToken)) {
+            setToken(storedToken);
+            setIsLoggedIn(true);
+            setUser({ email: userEmail });
+        } else {
+            logout(); // Clear invalid tokens
         }
     }, []);
 
     const login = (token, userDetails) => {
-        console.log("Token in login:", token);
-        try {
-            localStorage.setItem('token', token);
-            localStorage.setItem('userEmail', userDetails.email);
-            setIsLoggedIn(true);
-            setUser(userDetails);
-            // Redirect to the desired page after login
-            router.push('/'); // Or another route
-        } catch (error) {
-            console.error("Login error:", error);
-        }
+        localStorage.setItem('token', token);
+        localStorage.setItem('userEmail', userDetails.email);
+        setIsLoggedIn(true);
+        setUser(userDetails);
+        setToken(token);
+        router.push('/'); // Redirect to the dashboard
     };
 
     const logout = () => {
-        try {
-            localStorage.removeItem('token');
-            localStorage.removeItem('userEmail');
-            setIsLoggedIn(false);
-            setUser(null);
-            router.push('/'); // Redirect to login page
-        } catch (error) {
-            console.error("Logout error:", error);
-        }
+        localStorage.removeItem('token');
+        localStorage.removeItem('userEmail');
+        setIsLoggedIn(false);
+        setUser(null);
+        setToken(null);
+        router.push('/'); // Redirect to login page
     };
-
-    console.log("User from AuthContext:", user); // Add logging here to verify user data
 
     return (
         <AuthContext.Provider value={{ isLoggedIn, login, logout, user, token }}>

@@ -1,4 +1,5 @@
 'use client'
+import { useAuth } from '@/app/context/AuthContext';
 import { LoaderCircle } from 'lucide-react';
 import Link from 'next/link'
 import { useRouter } from 'next/navigation';
@@ -10,6 +11,13 @@ const Signup = () => {
     const [credentials, setCredentials] = useState({ email: "", password: "", name: "" });
     const [loading, setLoading] = useState(false);
     const [alert, setAlert] = useState({ type: '', message: '' });
+    const { isLoggedIn } = useAuth()
+
+    useEffect(() => {
+        if (isLoggedIn) {
+            router.push('/'); 
+        }
+    }, [isLoggedIn]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -73,13 +81,13 @@ const Signup = () => {
     return (
         <div className="min-h-screen flex items-center justify-center bg-white px-4 sm:px-6 lg:px-8">
             <div className="bg-white shadow-xl w-full max-w-lg px-6 py-10 sm:px-8 sm:py-12 lg:px-10 lg:py-14 rounded-lg">
-                <h2 className="text-2xl sm:text-3xl font-bold text-center text-zinc-700 mb-6 uppercase tracking-wider">
+                <h2 className="text-2xl sm:text-3xl font-bold font-header text-center text-zinc-700 mb-6 uppercase tracking-wider">
                     Welcome to Kitchen Craft
                 </h2>
                 {/* Form */}
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
-                        <label htmlFor="name" className="block text-zinc-700 mb-2 font-bold tracking-wide">
+                        <label htmlFor="name" className="block text-zinc-700 mb-2 font-bold font-header tracking-wide">
                             Name
                         </label>
                         <input
@@ -95,7 +103,7 @@ const Signup = () => {
                     </div>
 
                     <div className="mb-4">
-                        <label htmlFor="email" className="block text-zinc-700 mb-2 font-bold tracking-wide">
+                        <label htmlFor="email" className="block text-zinc-700 mb-2 font-bold font-header tracking-wide">
                             Email address
                         </label>
                         <input
@@ -111,7 +119,7 @@ const Signup = () => {
                     </div>
 
                     <div className="mb-4">
-                        <label htmlFor="password" className="block text-zinc-700 mb-2 font-bold tracking-wide">
+                        <label htmlFor="password" className="block text-zinc-700 mb-2 font-bold font-header tracking-wide">
                             Password
                         </label>
                         <input
@@ -129,7 +137,7 @@ const Signup = () => {
                     <div className="flex justify-center">
                         <button
                             type="submit"
-                            className={`flex justify-center items-center w-full sm:w-1/2 bg-slate-950 hover:bg-teal-800 text-white py-3 sm:py-4 uppercase text-md font-semibold tracking-wider transition duration-200 ${loading ? "cursor-not-allowed" : ""}`}
+                            className={`flex text-sm justify-center items-center font-header w-full sm:w-1/2 bg-slate-950 hover:bg-teal-800 text-white py-3 sm:py-4 uppercase text-md font-semibold tracking-wider transition duration-200 ${loading ? "cursor-not-allowed" : ""}`}
                             disabled={loading}
                         >
                             {loading ? <LoaderCircle className="animate-spin text-zinc-200" /> : "Signup"}
@@ -145,7 +153,7 @@ const Signup = () => {
 
                 <p className="text-center text-gray-600 mt-6">
                     Already have an account?{" "}
-                    <Link href="/login" className="text-blue-500 hover:underline cursor-pointer">
+                    <Link href="/login" className="text-blue-500 hover:underline cursor-pointer font-header text-sm">
                         Log in
                     </Link>
                 </p>

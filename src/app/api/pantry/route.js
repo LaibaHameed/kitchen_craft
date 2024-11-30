@@ -1,3 +1,4 @@
+import db from "@/lib/db";
 import { PantryModel } from "@/models/Pantry";
 import jwt, { verify } from "jsonwebtoken";
 
@@ -26,6 +27,7 @@ async function verifyToken(req) {
 // POST: Update Pantry
 export async function POST(req) {
   try {
+    await db.connect();
     const userEmail = await verifyToken(req); // Verify token and get email
     const body = await req.json(); // Parse request body
     const { pantry } = body;
@@ -50,8 +52,10 @@ export async function POST(req) {
 // GET: Fetch Pantry
 export async function GET(req) {
   try {
+    await db.connect();
     const userEmail = await verifyToken(req); // Verify token and get email
     // Fetch pantry by userId (not email)
+    console.log(userEmail);
     const userPantry = await PantryModel.findOne({ userId: userEmail }); // Query by `userId` instead of `email`
 
     return new Response(
@@ -59,7 +63,7 @@ export async function GET(req) {
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error fetching pantry:", error.message);
+    console.error("Error fetching pantry in route.js:", error.message);
     return new Response(
       JSON.stringify({ message: error.message || "Error fetching pantry" }),
       { status: 500 }

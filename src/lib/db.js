@@ -4,6 +4,8 @@ const mongoURI = process.env.MONGO_URI;
 const connection = {};
 
 async function connect() {
+  if (mongoose.connection.readyState >= 1) return; 
+  
   if (connection.isConnected) {
     console.log("already connected");
     return;
@@ -17,10 +19,9 @@ async function connect() {
     await mongoose.disconnect();
   }
   const db = await mongoose.connect(mongoURI, {
-    // useNewUrlParser: true,
-    // useUnifiedTopology: true,
     connectTimeoutMS: 30000, // 30 seconds
     socketTimeoutMS: 30000, // 30 seconds
+    serverSelectionTimeoutMS: 30000, 
   });
 
   console.log("new connection");
