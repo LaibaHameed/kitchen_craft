@@ -1,11 +1,11 @@
 import mongoose from 'mongoose';
 
 const PantrySchema = new mongoose.Schema({
-  userId: { type: String, required: true, unique: true }, // User's unique ID
+  userId: { type: String, required: true, unique: true }, 
   ingredients: [
     {
-      id: { type: String, required: true }, // Unique ingredient ID
-      name: { type: String, required: true }, // Ingredient name
+      id: { type: String, required: true }, 
+      name: { type: String, required: true }, 
     },
   ],
 });

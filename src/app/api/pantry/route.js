@@ -2,7 +2,7 @@ import db from "@/lib/db";
 import { PantryModel } from "@/models/Pantry";
 import jwt, { verify } from "jsonwebtoken";
 
-const jwtSecret = process.env.jwtSecret; // Ensure this is defined in your .env.local file
+const jwtSecret = process.env.jwtSecret; 
 
 // Helper to verify token
 async function verifyToken(req) {
@@ -16,8 +16,8 @@ async function verifyToken(req) {
 
   try {
     
-    const decoded = verify(token, jwtSecret); // Verify JWT token
-    return decoded.user.email; // Return the user's email from token
+    const decoded = verify(token, jwtSecret); 
+    return decoded.user.email; 
 
   } catch (error) {
     throw new Error("Invalid token");
@@ -28,13 +28,13 @@ async function verifyToken(req) {
 export async function POST(req) {
   try {
     await db.connect();
-    const userEmail = await verifyToken(req); // Verify token and get email
-    const body = await req.json(); // Parse request body
+    const userEmail = await verifyToken(req); 
+    const body = await req.json(); 
     const { pantry } = body;
 
     // Update or create the pantry for the user
     await PantryModel.findOneAndUpdate(
-      { userId: userEmail }, // Use `userId` instead of `email`
+      { userId: userEmail }, 
       { ingredients: pantry },
       { upsert: true, new: true }
     );
@@ -53,10 +53,10 @@ export async function POST(req) {
 export async function GET(req) {
   try {
     await db.connect();
-    const userEmail = await verifyToken(req); // Verify token and get email
-    // Fetch pantry by userId (not email)
+    const userEmail = await verifyToken(req); 
     console.log(userEmail);
-    const userPantry = await PantryModel.findOne({ userId: userEmail }); // Query by `userId` instead of `email`
+
+    const userPantry = await PantryModel.findOne({ userId: userEmail }); 
 
     return new Response(
       JSON.stringify({ pantry: userPantry?.ingredients || [] }), // Return ingredients or empty array if not found

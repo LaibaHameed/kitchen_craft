@@ -1,13 +1,12 @@
-'use client'
+'use client';
 import React, { useEffect, useState, useRef } from 'react';
-import SideBar from '@/components/SideBar';
+import { useAuth } from '@/app/context/AuthContext';
 import MealTypeDropdown from '@/components/MealTypeDropdown';
 import DietDropdown from '@/components/DietDropdown';
 import CuisineDropdown from '@/components/CuisineDropdown';
 import axios from 'axios';
 import RecipeCard from '@/components/RecipeCard';
-import Link from 'next/link';
-import { ArrowLeft, ArrowLeftSquare } from 'lucide-react';
+import Pantry from '@/components/Pantry';
 
 const GetIngredientsRecipe = () => {
   const [mealType, setMealType] = useState('');
@@ -17,30 +16,46 @@ const GetIngredientsRecipe = () => {
   const [selectedCuisine, setSelectedCuisine] = useState([]);
   const [cuisineOpen, setCuisineOpen] = useState(false);
   const [recipes, setRecipes] = useState([]);
-  const [ingredients, setIngredients] = useState([]); // Pantry items
-  const [sidebarVisible, setSidebarVisible] = useState(true); // state to manage sidebar visibility
+  const [ingredients, setIngredients] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [repLoading, setRepLoading] = useState(false);
+  const { isLoggedIn, user, token } = useAuth();
 
   const dietRef = useRef(null);
   const cuisineRef = useRef(null);
   const mealRef = useRef(null);
 
-  // Fetch pantry items from the Sidebar (or backend)
+  // Fetch user's pantry from the database on login
   const fetchPantry = async () => {
+    // If no token, user is not logged in, skip fetching pantry
+    if (!token) {
+      console.log("No token found. User is not logged in. Using local pantry only.");
+      return;
+    }
+
     try {
+      setLoading(true)
       const response = await axios.get('/api/pantry', {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
+      console.log(response.data.pantry);
+      setLoading(false)
       setIngredients(response.data.pantry || []);
     } catch (error) {
-      console.error('Error fetching pantry items:', error.message);
+      console.error('Error fetching pantry in sidebar:', error.message);
+    } finally {
+      setLoading(false)
     }
   };
+
 
   // Fetch recipes based on pantry and selected filters
   const fetchRecipes = async () => {
     try {
+      setRepLoading(true)
       const ingredientNames = ingredients.map((ingredient) => ingredient.name).join(',');
-
       const response = await axios.get('/api/ingredients-recipes', {
         params: {
           ingredients: ingredientNames,
@@ -49,22 +64,24 @@ const GetIngredientsRecipe = () => {
           cuisine: selectedCuisine.join(','),
         },
       });
+      setRepLoading(false);
       setRecipes(response.data);
     } catch (error) {
       console.error('Error fetching recipes:', error.message);
+    } finally {
+      setRepLoading(false)
     }
   };
 
   // Fetch recipes whenever ingredients or filters change
   useEffect(() => {
     if (ingredients.length > 0) {
-      // fetchRecipes();
+      fetchRecipes();
     }
   }, [ingredients, mealType, selectedDiet, selectedCuisine]);
 
-  // Close dropdowns when clicking outside
+  // Fetch pantry items on page load and handle dropdown clicks
   useEffect(() => {
-    // Fetch pantry items on page load
     fetchPantry();
     const handleClickOutside = (event) => {
       if (dietRef.current && !dietRef.current.contains(event.target)) {
@@ -84,11 +101,14 @@ const GetIngredientsRecipe = () => {
     };
   }, []);
 
+  // Handle selection for Meal Type (single)
   const handleMealTypeChange = (type) => {
     setMealType(type);
     setMealTypeOpen(false);
+    fetchRecipes();
   };
 
+  // Handle selection for Diet Definitions (multiple)
   const handleDietChange = (diet) => {
     setSelectedDiet((prev) => {
       if (prev.includes(diet)) {
@@ -97,8 +117,10 @@ const GetIngredientsRecipe = () => {
         return [...prev, diet];
       }
     });
+    fetchRecipes();
   };
 
+  // Handle selection for Cuisines (multiple)
   const handleCuisineChange = (cuisine) => {
     setSelectedCuisine((prev) => {
       if (prev.includes(cuisine)) {
@@ -107,72 +129,65 @@ const GetIngredientsRecipe = () => {
         return [...prev, cuisine];
       }
     });
-  };
-
-  const toggleSidebar = () => {
-    setSidebarVisible(!sidebarVisible);
+    fetchRecipes();
   };
 
   return (
-    // <div className='flex flex-col items-center'>
-
     <div className="flex flex-col w-full items-center mt-4 mx-2">
-
-      {/* <Link href={'/'} className='border border-teal-700 p-1'>
-        <ArrowLeft className='text-teal-800'/>
-      </Link> */}
-
       <h1 className='text-3xl font-header mt-7 text-teal-700 mx-3'> From Pantry to Plate: Recipes Made Simple </h1>
 
-      <SideBar />
+      {/* Pass props to Pantry */}
+      <Pantry
+        ingredients={ingredients}
+        setIngredients={setIngredients}
+        fetchPantry={fetchPantry}
+      />
 
       {/* Filters */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 sm:gap-2  max-w-screen-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-3 sm:gap-2 max-w-screen-sm">
         <MealTypeDropdown
           mealType={mealType}
           mealTypeOpen={mealTypeOpen}
           setMealTypeOpen={setMealTypeOpen}
-          handleMealTypeChange={setMealType}
+          handleMealTypeChange={handleMealTypeChange}
           mealRef={mealRef}
         />
         <DietDropdown
           selectedDiet={selectedDiet}
           dietOpen={dietOpen}
           setDietOpen={setDietOpen}
-          handleDietChange={(diet) =>
-            setSelectedDiet((prev) =>
-              prev.includes(diet) ? prev.filter((d) => d !== diet) : [...prev, diet]
-            )
-          }
+          handleDietChange={handleDietChange}
           dietRef={dietRef}
         />
         <CuisineDropdown
           selectedCuisine={selectedCuisine}
           cuisineOpen={cuisineOpen}
           setCuisineOpen={setCuisineOpen}
-          handleCuisineChange={(cuisine) =>
-            setSelectedCuisine((prev) =>
-              prev.includes(cuisine) ? prev.filter((c) => c !== cuisine) : [...prev, cuisine]
-            )
-          }
+          handleCuisineChange={handleCuisineChange}
           cuisineRef={cuisineRef}
         />
       </div>
 
       {/* Recipe Cards */}
-      <div className="my-8 grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {recipes.length > 0 ? (
-          recipes.map((recipe) => (
-            <RecipeCard key={recipe.id} recipe={recipe} />
-          ))
-        ) : (
-          <p className="col-span-3 text-center text-gray-500">No recipes found</p>
-        )}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 my-8">
+        {
+          loading ? (
+            <div className="animate-pulse col-span-3 h-60 text-center">
+              <p>Loading recipes...</p>
+            </div>
+          ) : (
+            recipes.length > 0 ? (
+              recipes.map((recipe) => (
+                <RecipeCard key={recipe.id} recipe={recipe} />
+              ))
+            ) : (
+              <p className="col-span-3 text-center text-gray-500">No recipes found</p>
+            )
+          )
+        }
+        { }
       </div>
-
-
     </div>
-    // </div>
   );
 };
 

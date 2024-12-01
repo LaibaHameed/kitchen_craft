@@ -2,7 +2,7 @@ import axios from "axios";
 
 export async function GET(req) {
     const { searchParams } = new URL(req.url);
-    const ingredients = searchParams.get("ingredients");  // This will be a comma-separated string
+    const ingredients = searchParams.get("ingredients");  
     const number = 30;
     const API_KEY = process.env.SPOONACULAR_API_KEY;
 
@@ -14,7 +14,6 @@ export async function GET(req) {
     }
 
     try {
-        // Spoonacular API expects ingredients as a comma-separated string
         const res = await axios.get(`https://api.spoonacular.com/recipes/findByIngredients`, {
             params: {
                 ingredients: ingredients,

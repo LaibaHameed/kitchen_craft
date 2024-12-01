@@ -21,7 +21,7 @@ const GetAnyRecipe = () => {
     const [dietOpen, setDietOpen] = useState(false);
     const [selectedCuisine, setSelectedCuisine] = useState([]);
     const [cuisineOpen, setCuisineOpen] = useState(false);
-    const suggestionBoxRef = useRef(null); // Reference for the suggestion box
+    const suggestionBoxRef = useRef(null);
     const dietRef = useRef(null);
     const cuisineRef = useRef(null);
     const mealRef = useRef(null);
@@ -71,7 +71,7 @@ const GetAnyRecipe = () => {
     // Handle search form submit
     const handleSearch = (e) => {
         e.preventDefault();
-        setSuggestions([]); // Clear suggestions on submit
+        setSuggestions([]);
         fetchRecipes();
     };
 
@@ -84,8 +84,8 @@ const GetAnyRecipe = () => {
 
     // Handle suggestion click
     const handleSuggestionClick = (suggestion) => {
-        setSearchQuery(suggestion.title); // Use the clicked suggestion
-        setSuggestions([]); // Clear suggestions after selection
+        setSearchQuery(suggestion.title);
+        setSuggestions([]);
         fetchRecipes();
     };
 
@@ -96,16 +96,16 @@ const GetAnyRecipe = () => {
                 suggestionBoxRef.current &&
                 !suggestionBoxRef.current.contains(event.target)
             ) {
-                setSuggestions([]); // Close the suggestion box
+                setSuggestions([]);
             }
             if (dietRef.current && !dietRef.current.contains(event.target)) {
-                setDietOpen(false); // Close Diet Definitions dropdown
+                setDietOpen(false);
             }
             if (cuisineRef.current && !cuisineRef.current.contains(event.target)) {
-                setCuisineOpen(false); // Close Cuisines dropdown
+                setCuisineOpen(false);
             }
             if (mealRef.current && !mealRef.current.contains(event.target)) {
-                setMealTypeOpen(false); // Close Cuisines dropdown
+                setMealTypeOpen(false);
             }
         };
 
@@ -191,14 +191,15 @@ const GetAnyRecipe = () => {
 
             {/* Recipe Results */}
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
-                {recipes.length ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
+                {loading ? (
+                    <div className='animate-pulse h-60'></div>
+                ) : recipes.length ? (
                     recipes.map((recipe) => <RecipeCard key={recipe.id} recipe={recipe} />)
                 ) : (
                     <p className="col-span-3 text-center text-gray-500">No recipes found</p>
                 )}
             </div>
-
 
 
             {error.message && (

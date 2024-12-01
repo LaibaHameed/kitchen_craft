@@ -6,10 +6,10 @@ import { useState } from "react";
 
 const Navbar = () => {
     const { isLoggedIn, logout, user } = useAuth();
-    const [showProfilePopup, setShowProfilePopup] = useState(false); // State for profile popup
+    const [showProfilePopup, setShowProfilePopup] = useState(false); 
 
     const toggleProfilePopup = () => {
-        setShowProfilePopup((prev) => !prev); // Toggle visibility
+        setShowProfilePopup((prev) => !prev); 
     };
 
     return (
@@ -93,13 +93,6 @@ const Navbar = () => {
                                 >
                                     Login
                                 </Link>
-
-                                {/* <Link
-                                    className="rounded-md bg-gray-100 px-5 py-2.5 text-sm font-medium text-teal-600 hover:bg-gray-300 hover:text-teal-800 transition-colors"
-                                    href="/sign-up"
-                                >
-                                    Register
-                                </Link> */}
                             </div>
                         )}
                     </div>
