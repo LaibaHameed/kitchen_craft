@@ -65,7 +65,8 @@ const GetIngredientsRecipe = () => {
         },
       });
       setRepLoading(false);
-      setRecipes(response.data);
+      const sortedRecipes = response.data.sort((a, b) => a.missedIngredientCount - b.missedIngredientCount);
+      setRecipes(sortedRecipes);
     } catch (error) {
       console.error('Error fetching recipes:', error.message);
     } finally {
@@ -169,12 +170,10 @@ const GetIngredientsRecipe = () => {
       </div>
 
       {/* Recipe Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 my-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 my-8">
         {
           loading ? (
-            <div className="animate-pulse col-span-3 h-60 text-center">
-              <p>Loading recipes...</p>
-            </div>
+            [1,2,3,4,5,6,7,8,9,10].map((i)=><div key={i} className="animate-pulse h-32 bg-slate-200"></div>)
           ) : (
             recipes.length > 0 ? (
               recipes.map((recipe) => (

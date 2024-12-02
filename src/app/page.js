@@ -8,15 +8,20 @@ import { useEffect, useState } from 'react';
 const Home = () => {
     const [recipes, setRecipes] = useState([])
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false)
 
     const fectRandomRecipes = async () => {
         try {
+            setLoading(true);
             const response = await axios.get('/api/random-recipes')
             setError('')
             setRecipes(response.data.recipes)
+            setLoading(false)
         } catch (error) {
             setError(error.message);
             console.error(error.message);
+        }finally{
+            setLoading(false)
         }
     }
 
@@ -39,10 +44,14 @@ const Home = () => {
                     {/* Recipe Results */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
 
-                        {recipes.length ? (
-                            recipes.map((recipe, i) => <RecipeCard key={recipe.id || i} recipe={recipe} />)
+                        {loading ? (
+                            [1,2,3,4,5,6,7,8,9,10].map((i)=><div key={i} className="animate-pulse h-32 bg-slate-200"></div>)
                         ) : (
-                            <p className="col-span-3 text-center text-gray-500">No recipes found</p>
+                            recipes.length ? (
+                                recipes.map((recipe, i) => <RecipeCard key={recipe.id || i} recipe={recipe} />)
+                            ) : (
+                                <p className="col-span-3 text-center text-gray-500">No recipes found</p>
+                            )
                         )}
                     </div>
                 </div>

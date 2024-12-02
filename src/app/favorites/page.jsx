@@ -8,8 +8,7 @@ import RecipeCard from '@/components/RecipeCard';
 
 const Favorites = () => {
     const { isLoggedIn, token } = useAuth();
-    const [favorites, setFavorites] = useState([]);  
-    const [recipeDetails, setRecipeDetails] = useState([]); 
+    const [favorites, setFavorites] = useState([]); // Stores the favorite recipes
     const [loading, setLoading] = useState(false);
     const router = useRouter();
 
@@ -20,52 +19,27 @@ const Favorites = () => {
         }
     }, [isLoggedIn]);
 
-    // Fetch favorite recipe IDs from the backend
+    // Fetch favorite recipes from the backend
     useEffect(() => {
         if (isLoggedIn) {
             const fetchFavorites = async () => {
                 try {
-                    setLoading(true)
+                    setLoading(true);
                     const response = await axios.get('/api/favorites', {
                         headers: {
                             Authorization: `Bearer ${token}`,
                         },
                     });
-                    console.log(response.data.favorites);
-                    setLoading(false)
-                    setFavorites(response.data.favorites); 
+                    setFavorites(response.data.favorites); // Directly use the favorite recipes
                 } catch (error) {
                     console.error('Error fetching favorite recipes:', error.message);
-                }finally{
-                    setLoading(false)
+                } finally {
+                    setLoading(false);
                 }
             };
             fetchFavorites();
         }
     }, [isLoggedIn, token]);
-
-    // Fetch recipe details using the recipe IDs
-    useEffect(() => {
-        const fetchRecipeDetails = async () => {
-            try {
-                setLoading(true)
-                const recipesData = await axios.post('/api/recipe-info', {
-                    recipeIds: favorites 
-                });
-
-                setLoading(false)
-                setRecipeDetails(recipesData.data.recipes); 
-            } catch (error) {
-                console.error('Error fetching recipe details:', error.message);
-            }finally{
-                setLoading(false)
-            }
-        };
-
-        if (favorites.length > 0) {
-            fetchRecipeDetails();
-        }
-    }, [favorites]);
 
     return (
         <div className="md:p-8 p-4">
@@ -73,19 +47,22 @@ const Favorites = () => {
 
             {/* Recipe cards container with responsive grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {
-                    loading ? (
-                        <div className='animate-pulse h-60'></div>
-                    ) : (
-                        recipeDetails.length > 0 ? (
-                            recipeDetails.map((recipe) => (
-                                <RecipeCard key={recipe.id} recipe={recipe} />
-                            ))
-                        ) : (
-                            <p className="text-center text-lg text-gray-500">No favorite recipes found.</p>
-                        )
-                    )
-                }
+                {loading ? (
+                    [1,2,3,4,5,6,7,8,9,10].map((i)=><div key={i} className="animate-pulse h-32 bg-slate-200"></div>)
+                ) : favorites.length > 0 ? (
+                    favorites.map((recipe) => (
+                        <RecipeCard
+                            key={recipe.recipeId}
+                            recipe={{
+                                id: recipe.recipeId,
+                                title: recipe.title,
+                                image: recipe.image,
+                            }}
+                        />
+                    ))
+                ) : (
+                    <p className="text-center text-lg text-gray-500">No favorite recipes found.</p>
+                )}
             </div>
         </div>
     );

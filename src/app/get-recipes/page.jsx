@@ -8,6 +8,7 @@ import MealTypeDropdown from '@/components/MealTypeDropdown';
 import DietDropdown from '@/components/DietDropdown';
 import CuisineDropdown from '@/components/CuisineDropdown';
 import RecipeCard from '@/components/RecipeCard';
+import ReadyTimeDropDown from '@/components/ReadyTimeDropDown';
 
 const GetAnyRecipe = () => {
     const [recipes, setRecipes] = useState([]);
@@ -17,6 +18,8 @@ const GetAnyRecipe = () => {
     const [error, setError] = useState('');
     const [mealType, setMealType] = useState('');
     const [mealTypeOpen, setMealTypeOpen] = useState(false);
+    const [maxReadyTime, setMaxReadyTime] = useState(null);
+    const [maxReadyTimeOpen, setMaxReadyTimeOpen] = useState(false);
     const [selectedDiet, setSelectedDiet] = useState([]);
     const [dietOpen, setDietOpen] = useState(false);
     const [selectedCuisine, setSelectedCuisine] = useState([]);
@@ -25,6 +28,7 @@ const GetAnyRecipe = () => {
     const dietRef = useRef(null);
     const cuisineRef = useRef(null);
     const mealRef = useRef(null);
+    const timeRef = useRef(null);
 
 
     // Fetch autocomplete suggestions
@@ -56,8 +60,9 @@ const GetAnyRecipe = () => {
         setLoading(true);
         setError('');
         try {
+            const maxTime = typeof maxReadyTime === 'number' ? maxReadyTime : undefined;
             const response = await axios.get('/api/recipes', {
-                params: { recipe: searchQuery, mealType, diet: selectedDiet.join(','), cuisine: selectedCuisine.join(',') },
+                params: { recipe: searchQuery, mealType, maxReadyTime:maxTime, diet: selectedDiet.join(','), cuisine: selectedCuisine.join(',') },
             });
             setRecipes(response.data.results);
         } catch (err) {
@@ -107,6 +112,9 @@ const GetAnyRecipe = () => {
             if (mealRef.current && !mealRef.current.contains(event.target)) {
                 setMealTypeOpen(false);
             }
+            if (timeRef.current && !timeRef.current.contains(event.target)) {
+                setMaxReadyTimeOpen(false);
+            }
         };
 
         document.addEventListener('mousedown', handleClickOutside);
@@ -146,6 +154,19 @@ const GetAnyRecipe = () => {
         fetchRecipes();
     };
 
+    const handleMaxTimeChange = (time) => {
+        if (typeof time === 'number' && time <= 120) {
+            setMaxReadyTime(time); // Set selected time if valid number within range
+        } else if (time === 121) {
+            setMaxReadyTime('> 120 Minutes'); // Handle '> 120 Minutes'
+        } else {
+            setMaxReadyTime(null); // Reset if invalid
+        }
+        setMaxReadyTimeOpen(false); // Close the dropdown
+
+        // Fetch recipes filtered by maxReadyTime
+        fetchRecipes();
+    };
 
 
     return (
@@ -163,7 +184,7 @@ const GetAnyRecipe = () => {
 
             <div className='flex items-center justify-center w-full'>
                 {/* Dropdowns */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 sm:gap-2  max-w-screen-sm mt-5 ">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 sm:gap-2  max-w-screen-lg mt-5 ">
 
                     <MealTypeDropdown
                         mealType={mealType}
@@ -186,6 +207,13 @@ const GetAnyRecipe = () => {
                         handleCuisineChange={handleCuisineChange}
                         cuisineRef={cuisineRef}
                     />
+                    <ReadyTimeDropDown
+                        timeRef={timeRef}
+                        maxReadyTime={maxReadyTime}
+                        maxReadyTimeOpen={maxReadyTimeOpen}
+                        setMaxReadyTimeOpen={setMaxReadyTimeOpen}
+                        handleMaxTimeChange={handleMaxTimeChange}
+                    />
                 </div>
             </div>
 
@@ -193,7 +221,7 @@ const GetAnyRecipe = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
                 {loading ? (
-                    <div className='animate-pulse h-60'></div>
+                    [1,2,3,4,5,6,7,8,9,10].map((i)=><div key={i} className="animate-pulse h-32 bg-slate-200"></div>)
                 ) : recipes.length ? (
                     recipes.map((recipe) => <RecipeCard key={recipe.id} recipe={recipe} />)
                 ) : (
