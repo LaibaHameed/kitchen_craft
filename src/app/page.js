@@ -6,9 +6,11 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 const Home = () => {
-    const [recipes, setRecipes] = useState([])
+    const [recipes, setRecipes] = useState([]);
     const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
+    const [loadingMore, setLoadingMore] = useState(false); // Separate loader for "Load More"
+    const [hasMore, setHasMore] = useState(true); // Flag to indicate if more recipes are available
 
     const fectRandomRecipes = async () => {
         try {
@@ -25,8 +27,27 @@ const Home = () => {
         }
     }
 
+    const loadMoreRecipes = async () => {
+        try {
+            setLoadingMore(true);
+            const response = await axios.get('/api/random-recipes');
+            const newRecipes = response.data.recipes;
+
+            if (newRecipes.length === 0) {
+                setHasMore(false); // If no new recipes, stop further loading
+            } else {
+                setRecipes((prevRecipes) => [...prevRecipes, ...newRecipes]); // Append new recipes
+            }
+        } catch (error) {
+            setError(error.message);
+            console.error('Error loading more recipes:', error.message);
+        } finally {
+            setLoadingMore(false);
+        }
+    };
+
     useEffect(() => {
-        // fectRandomRecipes();
+        fectRandomRecipes();
     }, [])
 
     return (
@@ -55,6 +76,18 @@ const Home = () => {
                         )}
                     </div>
                 </div>
+                {/* Load More Button */}
+                {hasMore && !loading && (
+                        <div className="flex justify-center my-8">
+                            <button
+                                className="py-2 px-4 sm:text-sm border-2 border-teal-600 bg-teal-600 text-gray-100 md:m-4 m-1 hover:bg-transparent hover:text-teal-700 hover:font-semibold"
+                                onClick={loadMoreRecipes}
+                                disabled={loadingMore}
+                            >
+                                {loadingMore ? 'Loading...' : 'Load More Recipes'}
+                            </button>
+                        </div>
+                    )}
                 {error.message && (
                     <div
                         role="alert"

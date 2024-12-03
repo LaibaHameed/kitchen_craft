@@ -26,36 +26,6 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    // Fetch favorites when the user is logged in
-    useEffect(() => {
-        const storedToken = localStorage.getItem('token');
-        const userEmail = localStorage.getItem('userEmail');
-
-        // Validate the token and userEmail
-        if (storedToken && userEmail && isTokenValid(storedToken)) {
-            setToken(storedToken);
-            setIsLoggedIn(true);
-            setUser({ email: userEmail });
-        } else {
-            logout(); // Clear invalid tokens and reset state
-        }
-
-        const fetchFavorites = async () => {
-            if (isLoggedIn && token) {
-                try {
-                    const response = await axios.get('/api/favorites', {
-                        headers: { Authorization: `Bearer ${token}` },
-                    });
-                    setFavorites(response.data.favorites | []);
-                } catch (error) {
-                    console.error('Error fetching favorites:', error);
-                }
-            }
-        };
-
-        fetchFavorites();
-    }, [isLoggedIn, token]);
-
     const login = (token, userDetails) => {
         localStorage.setItem('token', token);
         localStorage.setItem('userEmail', userDetails.email);
@@ -75,6 +45,20 @@ export const AuthProvider = ({ children }) => {
         router.push('/'); // Redirect to login page
     };
 
+    const fetchFavorites = async () => {
+        if (isLoggedIn && token) {
+            try {
+                const response = await axios.get('/api/favorites', {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                setFavorites(response.data.favorites || []);
+
+            } catch (error) {
+                console.error('Error fetching favorites:', error);
+            }
+        }
+    };
+
     const addToFavorites = async (recipe) => {
         if (!isLoggedIn || !token) return;
         try {
@@ -83,6 +67,7 @@ export const AuthProvider = ({ children }) => {
                 { recipeId: recipe.id, title: recipe.title, image: recipe.image },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
+
             setFavorites((prevFavorites) => [...prevFavorites, recipe]); // Update favorites in state
         } catch (error) {
             console.error('Error adding to favorites:', error);
@@ -91,16 +76,37 @@ export const AuthProvider = ({ children }) => {
 
     const removeFromFavorites = async (recipeId) => {
         if (!isLoggedIn || !token) return;
+
         try {
-            await axios.delete('/api/favorites', {
+            // Pass recipeId as a query parameter in the URL
+            await axios.delete(`/api/favorites?recipeId=${recipeId}`, {
                 headers: { Authorization: `Bearer ${token}` },
-                data: { recipeId },
             });
-            setFavorites((prevFavorites) => prevFavorites.filter((fav) => fav.recipeId !== recipeId)); // Remove from state
+
+            // Update state by filtering out the removed recipe
+            setFavorites((prevFavorites) =>
+                prevFavorites.filter((fav) => fav.recipeId !== recipeId)
+            );
         } catch (error) {
             console.error('Error removing from favorites:', error);
         }
     };
+
+    // Fetch favorites when the user is logged in
+    useEffect(() => {
+        const storedToken = localStorage.getItem('token');
+        const userEmail = localStorage.getItem('userEmail');
+
+        if (storedToken && userEmail && isTokenValid(storedToken)) {
+            setToken(storedToken);
+            setIsLoggedIn(true);
+            setUser({ email: userEmail });
+        } else {
+            logout();
+        }
+
+        fetchFavorites();
+    }, [isLoggedIn, token]);
 
     return (
         <AuthContext.Provider

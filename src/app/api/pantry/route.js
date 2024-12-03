@@ -59,7 +59,7 @@ export async function GET(req) {
     const userPantry = await PantryModel.findOne({ userId: userEmail }); 
 
     return new Response(
-      JSON.stringify({ pantry: userPantry?.ingredients || [] }), // Return ingredients or empty array if not found
+      JSON.stringify({ pantry: userPantry?.ingredients || [] }), 
       { status: 200 }
     );
   } catch (error) {

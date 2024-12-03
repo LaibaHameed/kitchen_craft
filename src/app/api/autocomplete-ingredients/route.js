@@ -18,7 +18,7 @@ export async function GET(req) {
             {
                 params: {
                     query,
-                    number: 20, // Limit the number of results
+                    number: 20,
                     apiKey: API_KEY,
                 },
             }

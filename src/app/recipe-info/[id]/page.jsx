@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const RecipeInfo = ({ params }) => {
     const router = useRouter();
@@ -11,16 +12,15 @@ const RecipeInfo = ({ params }) => {
     const [error, setError] = useState(null);
     const [instructions, setInstructions] = useState([]);
 
-    // Unwrap the `params` object to access the dynamic `id`
     const { id } = React.use(params);
 
     useEffect(() => {
-        if (!id) return;  // Avoid fetching if id is not available
+        if (!id) return;  
 
         const fetchRecipeDetails = async () => {
             try {
                 const response = await axios.get('/api/recipe-info', {
-                    params: { recipeId: id }, // Pass the `id` to the API
+                    params: { recipeId: id }, 
                 });
                 setRecipeDetails(response.data);
             } catch (error) {
@@ -41,6 +41,8 @@ const RecipeInfo = ({ params }) => {
             const steps = Array.from(paragraphs).map((p) => p.textContent.trim()).filter(Boolean);
             setInstructions(steps);
         }
+        console.log("recipeDetails: ", recipeDetails);
+        console.log("instructions: ", instructions);
     }, [recipeDetails]);
 
     const extractNutrition = (summary) => {
@@ -66,7 +68,7 @@ const RecipeInfo = ({ params }) => {
     const nutrition = extractNutrition(recipeDetails?.summary);
 
     const onClose = () => {
-        router.back(); // Go back to the previous page
+        router.back(); 
     };
 
     if (error) {
@@ -117,9 +119,21 @@ const RecipeInfo = ({ params }) => {
                     <strong className='font-header'>Instructions:</strong>
                 </p>
                 <ol className="list-decimal pl-6 text-sm text-gray-900 mt-2 font-sans">
-                    {instructions.map((step, index) => (
+                    {instructions.length > 0 ? instructions.map((step, index) => (
                         <li key={index} className="mb-2">{step}</li>
-                    ))}
+                    )) : (
+                        <p className='font-body'>
+                            no instructions found, 
+                            <Link
+                                href={recipeDetails.sourceUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-teal-600 hover:text-teal-800 underline font-header"
+                            >
+                                View full recipe
+                            </Link>
+                        </p>
+                    )}
                 </ol>
 
                 {/*  Nutrition Information */}
@@ -134,14 +148,14 @@ const RecipeInfo = ({ params }) => {
 
                 {/* Link to Full Recipe */}
                 <p className="text-sm text-gray-700 mt-4">
-                    <a
+                    <Link
                         href={recipeDetails.sourceUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-teal-600 hover:text-teal-800 underline font-header"
                     >
                         View full recipe
-                    </a>
+                    </Link>
                 </p>
             </div>
         </div>

@@ -7,7 +7,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 
 const RecipeCard = ({ recipe }) => {
-    const { isLoggedIn, token, favorites, addToFavorites, removeFromFavorites } = useAuth();
+    const { isLoggedIn, favorites, addToFavorites, removeFromFavorites } = useAuth();
     const [alert, setAlert] = useState({ type: '', message: '' });
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [popupIngredients, setPopupIngredients] = useState([]);
@@ -51,7 +51,7 @@ const RecipeCard = ({ recipe }) => {
                     </div>
                     <div className="flex justify-between items-center mt-4">
                         <div className="flex items-center gap-4">
-                            <button className={`text-teal-600 hover:text-teal-800 transition-colors ${isFavorite ? 'text-teal-700' : ''}`} onClick={handleToggleFavorite}>
+                            <button className={`text-teal-600 hover:text-teal-800 transition-colors ${isFavorite ? 'text-teal-700' : 'text-gray-800'}`} onClick={handleToggleFavorite}>
                                 <Heart height={20} fill={isFavorite ? 'currentColor' : 'none'} />
                             </button>
                             <Link href={`/recipe-info/${recipe.id}`}>

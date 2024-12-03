@@ -34,19 +34,15 @@ const GetIngredientsRecipe = () => {
     }
 
     try {
-      setLoading(true)
       const response = await axios.get('/api/pantry', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       console.log(response.data.pantry);
-      setLoading(false)
       setIngredients(response.data.pantry || []);
     } catch (error) {
       console.error('Error fetching pantry in sidebar:', error.message);
-    } finally {
-      setLoading(false)
     }
   };
 
@@ -54,7 +50,7 @@ const GetIngredientsRecipe = () => {
   // Fetch recipes based on pantry and selected filters
   const fetchRecipes = async () => {
     try {
-      setRepLoading(true)
+      setLoading(true)
       const ingredientNames = ingredients.map((ingredient) => ingredient.name).join(',');
       const response = await axios.get('/api/ingredients-recipes', {
         params: {
@@ -64,13 +60,13 @@ const GetIngredientsRecipe = () => {
           cuisine: selectedCuisine.join(','),
         },
       });
-      setRepLoading(false);
+      setLoading(false)
       const sortedRecipes = response.data.sort((a, b) => a.missedIngredientCount - b.missedIngredientCount);
       setRecipes(sortedRecipes);
     } catch (error) {
       console.error('Error fetching recipes:', error.message);
     } finally {
-      setRepLoading(false)
+      setLoading(false)
     }
   };
 
@@ -137,7 +133,7 @@ const GetIngredientsRecipe = () => {
     <div className="flex flex-col w-full items-center mt-4 mx-2">
       <h1 className='text-3xl font-header mt-7 text-teal-700 mx-3'> From Pantry to Plate: Recipes Made Simple </h1>
 
-      {/* Pass props to Pantry */}
+      {/*Pantry */}
       <Pantry
         ingredients={ingredients}
         setIngredients={setIngredients}

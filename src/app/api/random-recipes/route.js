@@ -1,7 +1,7 @@
 import axios from "axios"
 
 export async function GET() {
-    const number = 100
+    const number = 10
     const API_KEY = process.env.SPOONACULAR_API_KEY
 
     try {
