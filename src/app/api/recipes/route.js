@@ -7,7 +7,7 @@ export async function GET(req) {
     const type = searchParams.get('mealType')
     const cuisine = searchParams.get('cuisine')
     const maxReadyTime = searchParams.get('maxReadyTime')
-    const number = 10
+    const number = 60
     const API_KEY = process.env.SPOONACULAR_API_KEY
 
     if (!recipe) {

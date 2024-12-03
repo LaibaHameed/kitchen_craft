@@ -3,7 +3,7 @@ import axios from "axios";
 export async function GET(req) {
     const { searchParams } = new URL(req.url);
     const ingredients = searchParams.get("ingredients");  
-    const number = 10;
+    const number = 100;
     const API_KEY = process.env.SPOONACULAR_API_KEY;
 
     if (!ingredients) {
