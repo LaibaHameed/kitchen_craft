@@ -6,7 +6,7 @@ import Link from 'next/link';
 import React, { useState, useEffect, useRef } from 'react';
 
 const Pantry = ({ ingredients, setIngredients, fetchPantry }) => {
-  const { isLoggedIn, user, token } = useAuth();
+  const { isLoggedIn, token } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const suggestRef = useRef(null);

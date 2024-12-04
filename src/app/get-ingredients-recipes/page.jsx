@@ -18,8 +18,7 @@ const GetIngredientsRecipe = () => {
   const [recipes, setRecipes] = useState([]);
   const [ingredients, setIngredients] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [repLoading, setRepLoading] = useState(false);
-  const { isLoggedIn, user, token } = useAuth();
+  const { token } = useAuth();
 
   const dietRef = useRef(null);
   const cuisineRef = useRef(null);

@@ -168,6 +168,15 @@ const GetAnyRecipe = () => {
         fetchRecipes();
     };
 
+    useEffect(() => {
+        if (error.message) {
+            const timer = setTimeout(() => {
+                setError({ type: '', message: '' });
+            }, 3000); 
+            return () => clearTimeout(timer);
+        }
+    }, [error]);
+
 
     return (
         <div className="container mx-auto p-4">

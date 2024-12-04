@@ -34,6 +34,15 @@ const RecipeCard = ({ recipe }) => {
         }
     };
 
+    useEffect(() => {
+        if (error.message) {
+            const timer = setTimeout(() => {
+                setError({ type: '', message: '' });
+            }, 3000); 
+            return () => clearTimeout(timer);
+        }
+    }, [error]);
+
     return (
         <>
             <div key={recipe.id} className="rounded-lg sm:p-4 p-2 border border-teal-700 shadow-sm shadow-indigo-100 flex transition-transform transform hover:scale-105 hover:shadow-lg hover:shadow-indigo-200">
