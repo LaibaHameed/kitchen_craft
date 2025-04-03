@@ -3,7 +3,7 @@ import { useAuth } from '@/app/context/AuthContext';
 import Image from 'next/image';
 import { Heart, SquareArrowOutUpRight } from 'lucide-react';
 import { IngredientsPopup } from './IngredientsPopup';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
 const RecipeCard = ({ recipe }) => {
