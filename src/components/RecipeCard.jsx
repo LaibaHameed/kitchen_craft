@@ -35,13 +35,14 @@ const RecipeCard = ({ recipe }) => {
     };
 
     useEffect(() => {
-        if (error.message) {
+        if (alert.message) {
             const timer = setTimeout(() => {
-                setError({ type: '', message: '' });
-            }, 3000); 
+                setAlert({ type: '', message: '' });
+            }, 3000);
             return () => clearTimeout(timer);
         }
-    }, [error]);
+    }, [alert.message]);
+
 
     return (
         <>
